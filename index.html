@@ -1,18 +1,22 @@
 <!DOCTYPE html>
-<html lang="en" class=""> <!-- Start without 'dark', JS will add it based on preference/default -->
+<html lang="en" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Context - Folder Accumulator</title>
+
+    <!-- Google Material Symbols -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0" />
+
     <!-- Tailwind CSS via Play CDN -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
     <script>
-        // Tailwind Dark Mode Configuration & Custom Theme Colors (Unchanged)
-        tailwind.config = { /* ... same config ... */
+        // Tailwind Config (unchanged)
+        tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    colors: { // Using the previously refined Zinc palette for dark mode
+                    colors: { /* ...colors... */
                         'primary': { light: '#3b82f6', DEFAULT: '#3b82f6', dark: '#60a5fa' },
                         'secondary': { light: '#10b981', DEFAULT: '#10b981', dark: '#34d399' },
                         'background': { light: '#f9fafb', DEFAULT: '#f9fafb', dark: '#18181b' },
@@ -24,49 +28,58 @@
                         'error-surface': { light: '#fee2e2', DEFAULT: '#fee2e2', dark: '#3f1212' }
                     },
                     transitionTimingFunction: { 'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)' },
-                    keyframes: {
-                        'fade-scale-in': { '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' }, '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }, }
-                    },
+                    keyframes: { 'fade-scale-in': { '0%': { opacity: '0', transform: 'scale(0.95) translateY(10px)' }, '100%': { opacity: '1', transform: 'scale(1) translateY(0)' }, } },
                     animation: { 'fade-scale-in': 'fade-scale-in 0.3s ease-out forwards' }
                 }
             }
         }
-        // --- Theme Handling (Unchanged) ---
+        // Theme Handling (unchanged)
         const Theme = { LIGHT: 'light', DARK: 'dark' }; let currentTheme = localStorage.getItem('theme') || Theme.DARK;
         function applyTheme(theme, isInitial = false) { const htmlEl = document.documentElement; if (theme === Theme.DARK) htmlEl.classList.add('dark'); else htmlEl.classList.remove('dark'); if (!isInitial) document.body.classList.add('transition-colors', 'duration-300', 'ease-smooth'); localStorage.setItem('theme', theme); currentTheme = theme; updateThemeToggleButtonVisuals(); }
         function toggleTheme() { applyTheme(currentTheme === Theme.LIGHT ? Theme.DARK : Theme.LIGHT); }
-        function updateThemeToggleButtonVisuals() { const btn = document.getElementById('theme-toggle-btn'); const iconLight = document.getElementById('theme-icon-light'); const iconDark = document.getElementById('theme-icon-dark'); if (!btn || !iconLight || !iconDark) return; if (currentTheme === Theme.DARK) { iconLight.classList.add('hidden'); iconDark.classList.remove('hidden'); btn.setAttribute('aria-label', 'Switch to light mode'); } else { iconLight.classList.remove('hidden'); iconDark.classList.add('hidden'); btn.setAttribute('aria-label', 'Switch to dark mode'); } }
+        function updateThemeToggleButtonVisuals() { const btn = document.getElementById('theme-toggle-btn'); const iconLight = document.getElementById('theme-icon-light'); const iconDark = document.getElementById('theme-icon-dark'); if (!btn || !iconLight || !iconDark) return; if (currentTheme === Theme.DARK) { iconLight.style.display = 'none'; iconDark.style.display = 'inline-block'; btn.setAttribute('aria-label', 'Switch to light mode'); } else { iconLight.style.display = 'inline-block'; iconDark.style.display = 'none'; btn.setAttribute('aria-label', 'Switch to dark mode'); } }
         applyTheme(currentTheme, true);
         document.addEventListener('DOMContentLoaded', updateThemeToggleButtonVisuals);
     </script>
 
     <style type="text/tailwindcss">
-        body { @apply bg-background dark:bg-background-dark text-text-primary dark:text-text-primary-dark min-h-screen flex flex-col items-center p-4 sm:p-8; }
-        .spinner { @apply border-4 border-transparent border-l-primary dark:border-l-primary-dark border-t-primary dark:border-t-primary-dark rounded-full w-8 h-8 animate-spin; }
+        body { @apply bg-background dark:bg-background-dark text-text-primary dark:text-text-primary-dark min-h-screen flex flex-col items-center p-4 sm:p-8 font-sans; }
+        .spinner { @apply border-4 border-transparent border-l-primary dark:border-l-primary-dark border-t-primary dark:border-t-primary-dark rounded-full w-6 h-6 animate-spin; }
         #drop-zone { @apply transition-all duration-300 ease-smooth; }
         #drop-zone.dragover { @apply border-primary dark:border-primary-dark bg-primary/5 dark:bg-primary-dark/10 ring-2 ring-primary/50 dark:ring-primary-dark/50 ring-offset-2 ring-offset-background dark:ring-offset-background-dark shadow-xl scale-[1.03]; }
         button:focus-visible, a:focus-visible { @apply ring-2 ring-offset-2 ring-primary dark:ring-primary-dark ring-offset-background dark:ring-offset-background-dark outline-none rounded-md; }
         #theme-toggle-btn:focus-visible { @apply rounded-full; }
         #drop-zone:focus-visible { @apply ring-2 ring-primary dark:ring-primary-dark border-primary dark:border-primary-dark; }
-        .status-card, .error-card { @apply transition-all duration-300 ease-smooth; }
-        .status-card:hover { @apply shadow-lg dark:shadow-primary/10 -translate-y-1; }
-        .error-card:hover { @apply shadow-lg dark:shadow-error/10 -translate-y-1; }
-        .action-btn, .disabled-btn { @apply h-[40px] flex items-center justify-center px-5 py-2 text-sm font-medium rounded-md shadow-sm transition-all duration-150 ease-in-out; }
-        .action-btn { @apply bg-secondary dark:bg-secondary-dark text-white hover:bg-opacity-90 dark:hover:bg-opacity-90 active:scale-[0.97] active:bg-opacity-100; }
-        .clear-btn { @apply bg-gray-200 dark:bg-zinc-600 text-text-secondary dark:text-text-secondary-dark hover:bg-gray-300 dark:hover:bg-zinc-500 active:scale-[0.97]; }
-        .disabled-btn { @apply bg-gray-300 dark:bg-zinc-700 text-text-secondary dark:text-text-secondary-dark cursor-not-allowed opacity-70; }
+
+        /* Card styles */
+        .status-card, .error-card {
+            @apply rounded-lg shadow-sm p-4 border border-border dark:border-border-dark flex items-start space-x-3 min-h-[90px] animate-fade-scale-in transition-all duration-200 ease-smooth; /* Increased min-height slightly */
+        }
+        .status-card { @apply bg-surface dark:bg-surface-dark; }
+        .status-card:hover { @apply shadow-md -translate-y-0.5 border-primary/60 dark:border-primary-dark/60; }
+        .error-card { @apply bg-error-surface/50 dark:bg-error-surface dark:bg-opacity-40 border-error/50 dark:border-error/30; }
+        .error-card:hover { @apply shadow-md -translate-y-0.5 border-error/60 dark:border-error-dark/60; }
+
+        /* Button styles (unchanged) */
+        .btn { @apply h-[40px] inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-md shadow-sm transition-all duration-150 ease-in-out border border-transparent; }
+        .btn-icon { @apply !p-2 rounded-full w-[36px] h-[36px] flex items-center justify-center; }
+        .btn-primary { @apply bg-secondary dark:bg-secondary-dark text-white hover:bg-opacity-90 dark:hover:bg-opacity-90 active:scale-[0.97] active:bg-opacity-100; }
+        .btn-secondary { @apply bg-gray-200 dark:bg-zinc-600 text-text-secondary dark:text-text-secondary-dark hover:bg-gray-300 dark:hover:bg-zinc-500 active:scale-[0.97]; }
+        .btn-ghost { @apply bg-transparent dark:bg-transparent text-text-secondary dark:text-text-secondary-dark hover:bg-gray-100 dark:hover:bg-zinc-700 active:scale-[0.97]; }
+        .btn-disabled { @apply bg-gray-300 dark:bg-zinc-700 text-text-secondary dark:text-text-secondary-dark cursor-not-allowed opacity-70 shadow-sm; }
+
         .fade-transition { @apply transition-opacity duration-300 ease-smooth; }
         .footer-link { @apply inline-flex items-center font-medium text-primary dark:text-primary-dark transition-colors duration-200 ease-smooth; }
         .footer-link:hover { @apply underline text-opacity-80 dark:text-opacity-80; }
-        .footer-text-wrapper:hover .footer-link { /* Optional hover effect */ }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; @apply align-middle leading-none; }
     </style>
 </head>
 <body>
 
-    <!-- Theme Toggle Button (Unchanged) -->
+    <!-- Theme Toggle Button -->
     <button id="theme-toggle-btn" onclick="toggleTheme()" aria-label="Switch theme" class="fixed top-4 right-4 z-50 p-2.5 rounded-full bg-surface dark:bg-surface-dark text-text-secondary dark:text-text-secondary-dark shadow-md hover:shadow-lg hover:text-primary dark:hover:text-primary-dark hover:scale-110 active:scale-95 transform border border-border dark:border-border-dark transition-all duration-200 ease-smooth">
-        <svg id="theme-icon-light" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /> </svg>
-        <svg id="theme-icon-dark" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /> </svg>
+        <span id="theme-icon-light" class="material-symbols-outlined !text-xl">light_mode</span>
+        <span id="theme-icon-dark" class="material-symbols-outlined !text-xl">dark_mode</span>
     </button>
 
     <header class="text-center mb-10 mt-10 max-w-3xl">
@@ -74,50 +87,51 @@
             Context Accumulator
         </h1>
         <p class="text-lg sm:text-xl text-text-secondary dark:text-text-secondary-dark">
-            Drag & drop folders to add them. Download a combined context file when ready.
+            Drag & drop folders. Get text content & token estimates. Download individually or as a bundle.
         </p>
     </header>
 
     <main class="w-full max-w-5xl flex flex-col items-center flex-grow">
-        <!-- Drop Zone (Unchanged markup, slightly different text) -->
-        <div id="drop-zone" tabindex="0" aria-label="Drop zone for folders" class="w-full max-w-2xl border-2 border-dashed border-border dark:border-border-dark rounded-xl p-8 sm:p-12 text-center bg-surface dark:bg-surface-dark cursor-pointer mb-6 shadow-sm hover:border-primary dark:hover:border-primary-dark focus:border-primary dark:focus:border-primary-dark focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto mb-5 h-14 w-14 text-text-secondary dark:text-text-secondary-dark opacity-50 group-hover:opacity-75 transition-opacity" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1"> <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m6.75 12.75V15m0 0V8.25m0 6.75h3.75M8.25 15H4.5m3.75 0V8.25m0 6.75c0 1.105.895 2 2 2h3.5c1.105 0 2-.895 2-2m-.75-6.75h.75a2.25 2.25 0 012.25 2.25v7.5a2.25 2.25 0 01-2.25 2.25h-10.5a2.25 2.25 0 01-2.25-2.25v-7.5a2.25 2.25 0 012.25-2.25h.75" /> </svg> <!-- Different Icon: Folder Plus -->
-            <p class="font-semibold text-xl text-text-primary dark:text-text-primary-dark mb-2">Drag & Drop Folders to Accumulate</p>
-            <p class="text-sm text-text-secondary dark:text-text-secondary-dark">Each drop adds folders to the list below. Text files are compiled.</p>
+        <!-- Drop Zone -->
+        <div id="drop-zone" tabindex="0" aria-label="Drop zone for folders" class="w-full max-w-3xl border-2 border-dashed border-border dark:border-border-dark rounded-xl p-8 sm:p-12 text-center bg-surface dark:bg-surface-dark cursor-pointer mb-6 shadow-sm hover:border-primary dark:hover:border-primary-dark focus:border-primary dark:focus:border-primary-dark focus:outline-none">
+            <span class="material-symbols-outlined text-5xl mx-auto mb-4 text-text-secondary dark:text-text-secondary-dark opacity-50 group-hover:opacity-75 transition-opacity">upload_file</span>
+            <p class="font-semibold text-xl text-text-primary dark:text-text-primary-dark mb-2">Drag & Drop Folders Here</p>
+            <p class="text-sm text-text-secondary dark:text-text-secondary-dark">Text files are compiled, with estimated token counts provided.</p>
         </div>
 
-        <!-- Action Buttons & Status -->
-        <div id="action-area" class="w-full max-w-2xl flex flex-col sm:flex-row justify-between items-center mb-8 space-y-3 sm:space-y-0 sm:space-x-4">
-            <span id="folder-counter" class="text-sm font-medium text-text-secondary dark:text-text-secondary-dark order-last sm:order-first">
-                No folders added yet.
-            </span>
-            <div class="flex space-x-3">
-                 <button id="clear-all-btn" onclick="handleClearAll()" class="clear-btn hidden" aria-label="Clear all added folders">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /> </svg>
-                    Clear All
+        <!-- Action Buttons & Status Area -->
+        <div id="action-area" class="w-full max-w-3xl flex flex-col sm:flex-row justify-between items-center mb-8 space-y-4 sm:space-y-0 sm:space-x-4 bg-surface/50 dark:bg-surface-dark/30 rounded-lg p-3 sm:p-4 shadow-sm border border-border dark:border-border-dark">
+             <span id="folder-counter" class="text-sm font-medium text-text-secondary dark:text-text-secondary-dark order-last sm:order-first flex-shrink-0 px-2 text-center sm:text-left leading-tight"> <!-- Added leading-tight -->
+                 No folders added yet.
+             </span>
+             <div class="flex space-x-3 flex-shrink-0">
+                 <button id="clear-all-btn" onclick="handleClearAll()" class="btn btn-secondary hidden" aria-label="Clear all added folders">
+                     <span class="material-symbols-outlined text-lg mr-1.5">delete_sweep</span>
+                     Clear All
                  </button>
-                 <button id="download-bundle-btn" onclick="handleDownloadBundle()" class="action-btn" aria-label="Download combined context file" disabled>
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 inline-block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"> <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /> </svg>
-                    Download Bundle
-                </button>
-            </div>
-        </div>
+                 <button id="download-bundle-btn" onclick="handleDownloadBundle()" class="btn btn-primary btn-disabled" aria-label="Download combined context file" title="Download combined context file" disabled> <!-- Added title -->
+                     <span class="material-symbols-outlined text-lg mr-1.5">download_for_offline</span>
+                     Download Bundle
+                 </button>
+             </div>
+         </div>
 
-        <!-- Processing Indicator (Unchanged) -->
-        <div id="processing-indicator" class="fade-transition hidden opacity-0 items-center justify-center space-x-3 my-6">
+        <!-- Processing Indicator -->
+        <div id="processing-indicator" class="fade-transition hidden opacity-0 items-center justify-center space-x-2 my-6">
             <div class="spinner"></div>
-            <p class="text-lg font-medium text-primary dark:text-primary-dark">Processing...</p>
+            <p class="text-base font-medium text-primary dark:text-primary-dark">Processing...</p>
         </div>
 
         <!-- Output Area - List of Added Folders/Errors -->
-        <div id="output-area" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        <div id="output-area" class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
             <!-- Status cards and error cards appear here -->
         </div>
     </main>
 
-    <!-- Footer (Unchanged) -->
-    <footer class="w-full max-w-5xl text-center mt-16 mb-6 pt-6"> <!-- ... same footer ... -->
-         <p class="footer-text-wrapper group text-sm text-text-secondary dark:text-text-secondary-dark inline-flex items-center transition-transform duration-200 ease-smooth hover:scale-[1.03]"> Built by  <a href="https://github.com/andermendz" target="_blank" rel="noopener noreferrer" class="footer-link focus:underline"> <svg class="w-4 h-4 mr-1.5 group-hover:text-primary dark:group-hover:text-primary-dark transition-colors duration-200 ease-smooth" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"> <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/> </svg> andermendz </a> </p>
+    <!-- Footer -->
+    <footer class="w-full max-w-5xl text-center mt-16 mb-6 pt-6 border-t border-border dark:border-border-dark">
+         <p class="footer-text-wrapper group text-sm text-text-secondary dark:text-text-secondary-dark inline-flex items-center transition-transform duration-200 ease-smooth hover:scale-[1.03]"> Built by  <a href="https://github.com/andermendz" target="_blank" rel="noopener noreferrer" class="footer-link focus:underline"> <svg class="w-4 h-4 mr-1 group-hover:text-primary dark:group-hover:text-primary-dark transition-colors duration-200 ease-smooth" fill="currentColor" viewBox="0 0 16 16" aria-hidden="true"> <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/> </svg> andermendz </a> </p>
+         <p class="text-xs text-text-secondary/70 dark:text-text-secondary-dark/70 mt-2">Token estimations are approximate, based on general rules (chars/4 and words*1.33). Actual counts depend on the specific LLM tokenizer.</p>
     </footer>
 
     <script>
@@ -138,9 +152,10 @@
         ]);
 
         let processingTimeout = null;
-        let accumulatedFolders = []; // <-- Global state for accumulated results
+        // Global state: Array of { folderName: string, outputText: string, fileCount: number, estimatedMinTokens: number, estimatedMaxTokens: number }
+        let accumulatedFolders = [];
 
-        // --- Drag and Drop Handlers ---
+        // --- Drag and Drop Handlers (Mostly unchanged) ---
         dropZone.addEventListener('dragenter', (event) => { event.preventDefault(); dropZone.classList.add('dragover'); });
         dropZone.addEventListener('dragover', (event) => event.preventDefault());
         dropZone.addEventListener('dragleave', (event) => { if (!dropZone.contains(event.relatedTarget)) { dropZone.classList.remove('dragover'); } });
@@ -148,49 +163,39 @@
             event.preventDefault();
             dropZone.classList.remove('dragover');
             showProcessingIndicator();
-            // DO NOT CLEAR outputArea.innerHTML = ''; // Accumulate results
-
             const items = event.dataTransfer.items;
             const folderPromises = [];
             let droppedItemCount = 0;
+            let duplicateCount = 0;
 
             if (items) {
                  droppedItemCount = items.length;
-                 Array.from(items).forEach(item => {
+                 Array.from(items).forEach(item => { /* ... duplicate/type checking ... */
                     const entry = item.webkitGetAsEntry();
                     if (entry?.isDirectory) {
-                        // Prevent adding duplicates by name (simple check)
                         if (!accumulatedFolders.some(f => f.folderName === entry.name)) {
                            folderPromises.push(processFolder(entry));
                         } else {
                            console.warn(`Skipping duplicate folder: ${entry.name}`);
-                           // Optionally add a visual indicator that it was skipped?
-                           addErrorCard('Skipped Duplicate', `Folder "${entry.name}" is already in the list.`, false, true); // Added silent flag
+                           addErrorCard('Duplicate Skipped', `Folder "${entry.name}" is already added.`, false, true);
+                           duplicateCount++;
                         }
                     } else if (entry) {
-                        addErrorCard('Skipped Item', `"${entry.name}" is not a folder.`);
+                        addErrorCard('Item Skipped', `"${entry.name}" is not a folder.`);
                     } else {
-                        addErrorCard('Skipped Item', 'Could not access one dropped item.');
+                        addErrorCard('Item Skipped', 'Could not access one dropped item.');
                     }
                  });
-            } else {
+            } else { /* ... error handling ... */
                 addErrorCard('Browser Issue', "Could not access dropped items.", true);
-                hideProcessingIndicator();
-                return;
+                hideProcessingIndicator(); return;
             }
 
-            // Handle cases where only non-folders or nothing processable was dropped
-            if (folderPromises.length === 0 && droppedItemCount > 0) {
-                 if (outputArea.querySelectorAll('.error-card[data-silent="true"]').length !== droppedItemCount) { // Don't show "no folders" if only duplicates were dropped
-                    addErrorCard('No New Folders Found', "Only non-folder items or duplicates were dropped.", false);
-                 }
-                 hideProcessingIndicator();
-                 updateBundleControls(); // Still update controls in case errors were added
-                 return;
-            } else if (folderPromises.length === 0) {
-                 hideProcessingIndicator();
-                 updateBundleControls();
-                 return;
+            if (folderPromises.length === 0 && droppedItemCount > 0) { /* ... error handling ... */
+                 if (duplicateCount < droppedItemCount) { addErrorCard('No New Folders', "Only non-folder items or duplicates were dropped.", false); }
+                 hideProcessingIndicator(); updateBundleControls(); return;
+            } else if (folderPromises.length === 0) { /* ... error handling ... */
+                 hideProcessingIndicator(); updateBundleControls(); return;
             }
 
             Promise.allSettled(folderPromises).then(results => {
@@ -198,56 +203,107 @@
                 let successCount = 0;
                 results.forEach(result => {
                     if (result.status === 'fulfilled') {
-                        const { folderName, outputText, fileCount } = result.value;
+                        // Destructure the result, including new token estimates
+                        const { folderName, outputText, fileCount, estimatedMinTokens, estimatedMaxTokens } = result.value;
+
+                        // Store all data, even if fileCount is 0
+                        accumulatedFolders.push({ folderName, outputText, fileCount, estimatedMinTokens, estimatedMaxTokens });
+
+                        // Display status, indicating empty if needed
                         if (fileCount > 0) {
-                            // Add to accumulation AND display status
-                            accumulatedFolders.push({ folderName, outputText, fileCount });
-                            displayAddedFolderStatus(folderName, fileCount);
+                            displayAddedFolderStatus(folderName, fileCount, estimatedMinTokens, estimatedMaxTokens);
                             successCount++;
                         } else {
-                            // Display empty status, don't add to bundle
-                            displayAddedFolderStatus(folderName, 0, true);
+                            displayAddedFolderStatus(folderName, 0, 0, 0, true); // Show empty status, 0 tokens
                         }
-                    } else {
-                        // Handle processing errors
+                    } else { /* ... error handling ... */
                         const folderName = result.reason?.folderName || 'Unknown Folder';
-                        addErrorCard(`Processing Error: ${folderName}`, result.reason?.message || 'Failed to process this folder.');
+                        addErrorCard(`Processing Error: ${folderName}`, result.reason?.message || 'Failed to process folder.');
                     }
                 });
-
-                updateBundleControls(); // Update buttons based on accumulatedFolders
-
-                if (successCount > 0) {
-                    flashDropZoneBorder('border-secondary', 'dark:border-secondary-dark');
-                } else if (outputArea.childElementCount > accumulatedFolders.length + outputArea.querySelectorAll('.error-card').length) {
-                    // Check if *any* error cards were added in this batch
-                    flashDropZoneBorder('border-error', 'dark:border-error-dark');
-                }
+                updateBundleControls();
+                if (successCount > 0) { flashDropZoneBorder('border-secondary', 'dark:border-secondary-dark'); }
+                else if (outputArea.querySelectorAll('.error-card:not([data-silent="true"])').length > outputArea.children.length - accumulatedFolders.length) { flashDropZoneBorder('border-error', 'dark:border-error-dark'); }
             });
         });
 
         // --- UI Update Functions ---
-        function showProcessingIndicator() { clearTimeout(processingTimeout); processingIndicator.classList.remove('hidden'); requestAnimationFrame(() => { processingIndicator.classList.add('flex'); processingIndicator.classList.remove('opacity-0'); }); }
-        function hideProcessingIndicator() { processingIndicator.classList.add('opacity-0'); processingTimeout = setTimeout(() => { processingIndicator.classList.add('hidden'); processingIndicator.classList.remove('flex'); }, 300); }
-        function flashDropZoneBorder(lightClass, darkClass) { dropZone.classList.add(lightClass, darkClass, 'border-solid'); dropZone.classList.remove('border-dashed'); setTimeout(() => { dropZone.classList.remove(lightClass, darkClass, 'border-solid'); dropZone.classList.add('border-dashed'); }, 800); }
+        function showProcessingIndicator() { /* ... unchanged ... */ clearTimeout(processingTimeout); processingIndicator.classList.remove('hidden'); requestAnimationFrame(() => { processingIndicator.classList.add('flex'); processingIndicator.classList.remove('opacity-0'); }); }
+        function hideProcessingIndicator() { /* ... unchanged ... */ processingIndicator.classList.add('opacity-0'); processingTimeout = setTimeout(() => { processingIndicator.classList.add('hidden'); processingIndicator.classList.remove('flex'); }, 300); }
+        function flashDropZoneBorder(lightClass, darkClass) { /* ... unchanged ... */ dropZone.classList.add(lightClass, darkClass, 'border-solid'); dropZone.classList.remove('border-dashed'); setTimeout(() => { dropZone.classList.remove(lightClass, darkClass, 'border-solid'); dropZone.classList.add('border-dashed'); }, 800); }
 
-        // --- Core Folder Processing Logic (Unchanged) ---
+        // --- *** UPDATED Core Folder Processing Logic *** ---
         async function processFolder(directoryEntry) {
-            const outputLines = []; const folderName = directoryEntry.name; let fileCount = 0;
-            try { /* ... same recursive traverseDirectory ... */
-                await traverseDirectory(directoryEntry, '');
-                outputLines.sort((a, b) => a.path.localeCompare(b.path));
-                const outputText = outputLines.map(item => `// Path: ${folderName}${item.path ? '/' + item.path : ''}\n${item.content}`).join('\n\n---\n\n');
-                fileCount = outputLines.filter(line => !line.content.startsWith("// Error reading file:")).length;
-                return { folderName, outputText, fileCount };
-            } catch (error) { console.error(`Error processing folder ${folderName}:`, error); error.folderName = folderName; throw error; }
-            async function traverseDirectory(entry, currentRelativePath) { /* ... same ... */
-                 if (entry.isFile) { await processFileEntry(entry, currentRelativePath ? `${currentRelativePath}/${entry.name}` : entry.name); }
-                 else if (entry.isDirectory) { const reader = entry.createReader(); let entries = []; let readEntriesBatch; do { readEntriesBatch = await readEntriesFromReader(reader); entries = entries.concat(readEntriesBatch); } while (readEntriesBatch.length > 0); const dirPath = currentRelativePath ? `${currentRelativePath}/${entry.name}` : entry.name; const promises = entries.map(subEntry => traverseDirectory(subEntry, dirPath)); await Promise.all(promises); }
+            const outputLines = []; // Array of { relativePath: string, content: string }
+            const folderName = directoryEntry.name;
+            let fileCount = 0;
+            let totalChars = 0;
+            let totalWords = 0;
+
+            try {
+                await traverseDirectory(directoryEntry, ''); // Start traversal
+
+                // Sort alphabetically by relative path
+                outputLines.sort((a, b) => a.relativePath.localeCompare(b.relativePath));
+
+                // Calculate stats and format output *after* traversal
+                let validFileContent = ''; // Accumulate content only from successfully read text files
+                 outputLines.forEach(item => {
+                    if (!item.content.startsWith("// Error reading file:")) {
+                        fileCount++;
+                        totalChars += item.content.length;
+                        totalWords += item.content.split(/\s+/).filter(Boolean).length; // Simple word count
+                        validFileContent += `Path: ${item.relativePath}\n${item.content}\n\n---\n\n`;
+                    } else {
+                         // Still include errors in the final output text, but don't count towards stats
+                         validFileContent += `Path: ${item.relativePath}\n${item.content}\n\n---\n\n`;
+                    }
+                 });
+                 // Remove trailing separator
+                 validFileContent = validFileContent.replace(/(\n\n---\n\n)$/, '');
+
+
+                // --- Token Estimation ---
+                // Rule 1: ~4 chars per token (floor)
+                const estimatedMinTokens = totalChars > 0 ? Math.floor(totalChars / 4) : 0;
+                // Rule 2: ~1.33 tokens per word (ceil)
+                const estimatedMaxTokens = totalWords > 0 ? Math.ceil(totalWords * 1.33) : (totalChars > 0 ? 1 : 0) ; // Ensure at least 1 token if there's any char but 0 words
+
+                // Final output text for this folder
+                 const outputText = validFileContent || (fileCount === 0 ? `// Folder "${folderName}" contained no readable text files.\n` : '');
+
+
+                return {
+                    folderName,
+                    outputText,
+                    fileCount,
+                    estimatedMinTokens,
+                    estimatedMaxTokens
+                };
+
+            } catch (error) { /* ... error handling unchanged ... */
+                console.error(`Error processing folder ${folderName}:`, error); error.folderName = folderName; throw error;
             }
-            async function processFileEntry(fileEntry, relativeFilePath) { /* ... same ... */
-                 try { const file = await getFileFromFileEntry(fileEntry); if (isTextFile(file.name)) { const content = await readFileContent(file); outputLines.push({ path: relativeFilePath, content: content }); } } catch (error) { console.warn(`Read Err: ${folderName}/${relativeFilePath}`, error); outputLines.push({ path: relativeFilePath, content: `// Error reading file: ${error.message}` }); }
-             }
+
+            // --- Helper functions (nested, unchanged structure) ---
+            async function traverseDirectory(entry, currentRelativePath) { /* ... unchanged ... */
+                const entryRelativePath = currentRelativePath ? `${currentRelativePath}/${entry.name}` : entry.name;
+                if (entry.isFile) { await processFileEntry(entry, entryRelativePath); }
+                else if (entry.isDirectory) { /* ... read entries ... */
+                    const reader = entry.createReader(); let entries = []; let readEntriesBatch;
+                    do { readEntriesBatch = await readEntriesFromReader(reader); entries = entries.concat(readEntriesBatch); } while (readEntriesBatch.length > 0);
+                    const promises = entries.map(subEntry => traverseDirectory(subEntry, entryRelativePath)); await Promise.all(promises);
+                }
+            }
+            async function processFileEntry(fileEntry, relativePath) { /* ... unchanged ... */
+                try {
+                    const file = await getFileFromFileEntry(fileEntry);
+                    if (isTextFile(file.name)) {
+                        const content = await readFileContent(file);
+                        outputLines.push({ relativePath: relativePath, content: content });
+                    } // Non-text files are just ignored here
+                } catch (error) { console.warn(`Read Err: ${relativePath}`, error); outputLines.push({ relativePath: relativePath, content: `// Error reading file: ${error.message || 'Unknown error'}` }); }
+            }
         }
 
         // --- Promise Wrappers & Utilities (Unchanged) ---
@@ -256,111 +312,188 @@
         function readFileContent(file) { return new Promise((resolve, reject) => { const reader = new FileReader(); reader.onload = (event) => resolve(event.target.result); reader.onerror = (event) => reject(new Error(`Read Err: ${event.target.error?.message || 'Unknown'}`)); reader.readAsText(file); }); }
         function isTextFile(filename) { if (!filename || !filename.includes('.')) return false; const extension = filename.substring(filename.lastIndexOf('.')).toLowerCase(); return TEXT_EXTENSIONS.has(extension); }
 
-        // --- NEW/MODIFIED Card and Control Functions ---
+        // --- Card Display Functions ---
 
-        /** Displays a status card for an added folder */
-        function displayAddedFolderStatus(folderName, fileCount, isEmpty = false) {
+        /** Displays a status card for an added folder with token estimates */
+        function displayAddedFolderStatus(folderName, fileCount, minTokens, maxTokens, isEmpty = false) {
+            const cardId = `folder-card-${folderName.replace(/[^a-zA-Z0-9]/g, '-')}`;
+            if (document.getElementById(cardId)) return; // Avoid duplicates
+
             const card = document.createElement('div');
-            card.className = 'status-card bg-surface dark:bg-surface-dark rounded-lg shadow-sm p-4 border border-border dark:border-border-dark flex items-center space-x-3 min-h-[80px] animate-fade-scale-in';
-            card.dataset.folderName = folderName; // Add data attribute for potential future use (e.g., removal)
+            card.id = cardId;
+            card.className = 'status-card relative';
+            card.dataset.folderName = folderName;
 
-            const iconSvg = isEmpty
-              ? `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-text-secondary dark:text-text-secondary-dark opacity-70 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M5 19a2 2 0 01-2-2V7a2 2 0 012-2h4l2 2h4a2 2 0 012 2v1M5 19h14a2 2 0 002-2v-5a2 2 0 00-2-2H9a2 2 0 00-2 2v5a2 2 0 01-2 2z" /> </svg>` // Folder Open (Emptyish)
-              : `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary dark:text-primary-dark flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /> </svg>`; // Folder Filled
+            const iconName = isEmpty ? 'folder_open' : 'folder';
+            const iconColor = isEmpty ? 'text-text-secondary dark:text-text-secondary-dark opacity-70' : 'text-primary dark:text-primary-dark';
+
+            // Format token counts nicely
+            const minTokenStr = minTokens.toLocaleString();
+            const maxTokenStr = maxTokens.toLocaleString();
+            const tokenEstimateText = isEmpty ? '0 tokens' : `~${minTokenStr} - ${maxTokenStr} tokens`;
 
             card.innerHTML = `
-                ${iconSvg}
-                <div class="flex-grow overflow-hidden">
-                    <h3 class="text-base font-semibold text-text-primary dark:text-text-primary-dark truncate" title="${folderName}">${folderName}</h3>
+                <span class="material-symbols-outlined ${iconColor} text-2xl flex-shrink-0 mt-0.5"> ${iconName} </span>
+                <div class="flex-grow overflow-hidden pr-10 space-y-1"> <!-- Added space-y-1 -->
+                    <h3 class="text-base font-medium text-text-primary dark:text-text-primary-dark truncate" title="${folderName}">${folderName}</h3>
                     <p class="text-xs text-text-secondary dark:text-text-secondary-dark">
-                        ${isEmpty ? 'No text files found.' : `${fileCount} text file${fileCount !== 1 ? 's' : ''} ready.`}
+                        ${isEmpty ? 'No text files found.' : `${fileCount.toLocaleString()} text file${fileCount !== 1 ? 's' : ''}`}
                     </p>
-                </div>`;
+                    <p class="text-xs text-text-secondary dark:text-text-secondary-dark" title="Estimated token range based on character count (~chars/4) and word count (~words*1.33)">
+                       ${tokenEstimateText} (est.)
+                    </p>
+                </div>
+                <!-- Individual Download Button -->
+                ${!isEmpty ? `
+                <button
+                    class="btn btn-ghost btn-icon absolute top-2 right-2 download-folder-btn"
+                    aria-label="Download context for ${folderName}"
+                    title="Download context for ${folderName}"
+                    data-folder="${folderName}"
+                    onclick="handleIndividualDownload(event)">
+                    <span class="material-symbols-outlined text-lg">download</span>
+                </button>
+                ` : ''}
+            `;
             outputArea.appendChild(card);
         }
 
+
         /** Displays an error card */
-        function addErrorCard(title, message, isMajor = false, silent = false) {
-             const card = document.createElement('div');
-             // Removed col-span logic as grid might behave differently now
-             card.className = `error-card bg-error-surface/50 dark:bg-error-surface dark:bg-opacity-40 rounded-lg shadow-sm p-4 border border-error/50 dark:border-error/30 flex items-start space-x-3 min-h-[80px] animate-fade-scale-in`;
-             if (silent) card.dataset.silent = "true"; // Mark silent errors (like duplicates)
-             card.innerHTML = `
-                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-error dark:text-error-dark flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"> <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /> </svg>
-                 <div class="flex-grow overflow-hidden">
-                    <h3 class="text-sm font-semibold text-error dark:text-error-dark truncate" title="${title}">${title}</h3>
-                    <p class="text-xs text-error/90 dark:text-error-dark/90"> ${message} </p>
-                 </div>`;
+        function addErrorCard(title, message, isMajor = false, silent = false) { /* ... unchanged ... */
+             const card = document.createElement('div'); card.className = 'error-card'; if (silent) card.dataset.silent = "true";
+             card.innerHTML = `<span class="material-symbols-outlined text-error dark:text-error-dark text-xl flex-shrink-0 mt-0.5">warning</span> <div class="flex-grow overflow-hidden"> <h3 class="text-sm font-semibold text-error dark:text-error-dark" title="${title}">${title}</h3> <p class="text-xs text-error/90 dark:text-error-dark/90"> ${message} </p> </div>`;
              outputArea.appendChild(card);
         }
 
-        /** Updates the state of Download/Clear buttons and counter */
+        // --- Control Update and Action Handlers ---
+
+        /** Updates the state of Download/Clear buttons and counter, including total token estimates */
         function updateBundleControls() {
             const count = accumulatedFolders.length;
+            let totalFiles = 0;
+            let totalMinTokens = 0;
+            let totalMaxTokens = 0;
+
+            accumulatedFolders.forEach(f => {
+                totalFiles += f.fileCount;
+                totalMinTokens += f.estimatedMinTokens;
+                totalMaxTokens += f.estimatedMaxTokens;
+            });
+
+            const totalMinTokenStr = totalMinTokens.toLocaleString();
+            const totalMaxTokenStr = totalMaxTokens.toLocaleString();
+
             if (count > 0) {
-                downloadBundleBtn.disabled = false;
-                downloadBundleBtn.classList.remove('disabled-btn'); // Ensure styling matches enabled state
-                downloadBundleBtn.classList.add('action-btn');
+                // Enable Bundle button only if there are files to bundle
+                if (totalFiles > 0) {
+                    downloadBundleBtn.disabled = false;
+                    downloadBundleBtn.classList.remove('btn-disabled');
+                    downloadBundleBtn.classList.add('btn-primary');
+                    // Update tooltip and label for bundle button
+                    const btnLabel = `Download Bundle (~${totalMinTokenStr}-${totalMaxTokenStr} est. tokens)`;
+                    downloadBundleBtn.setAttribute('aria-label', btnLabel);
+                    downloadBundleBtn.setAttribute('title', btnLabel);
+
+                } else {
+                    downloadBundleBtn.disabled = true;
+                    downloadBundleBtn.classList.add('btn-disabled');
+                    downloadBundleBtn.classList.remove('btn-primary');
+                    const btnLabel = 'Download Bundle (No files added)';
+                    downloadBundleBtn.setAttribute('aria-label', btnLabel);
+                    downloadBundleBtn.setAttribute('title', btnLabel);
+                }
+
                 clearAllBtn.classList.remove('hidden');
-                folderCounter.textContent = `${count} folder${count !== 1 ? 's' : ''} added.`;
+                // Update counter text with totals
+                folderCounter.innerHTML = `
+                    ${count} folder${count !== 1 ? 's' : ''} added (${totalFiles.toLocaleString()} file${totalFiles !== 1 ? 's' : ''}).<br>
+                    Total est. tokens: ~${totalMinTokenStr} - ${totalMaxTokenStr}
+                `;
             } else {
                 downloadBundleBtn.disabled = true;
-                downloadBundleBtn.classList.add('disabled-btn');
-                downloadBundleBtn.classList.remove('action-btn');
+                downloadBundleBtn.classList.add('btn-disabled');
+                downloadBundleBtn.classList.remove('btn-primary');
+                const btnLabel = 'Download combined context file';
+                downloadBundleBtn.setAttribute('aria-label', btnLabel);
+                downloadBundleBtn.setAttribute('title', btnLabel);
                 clearAllBtn.classList.add('hidden');
                 folderCounter.textContent = 'No folders added yet.';
             }
         }
 
-        /** Handles the download bundle button click */
+        /** Triggers download for a single folder */
+        function handleIndividualDownload(event) { /* ... unchanged ... */
+             event.stopPropagation(); const button = event.currentTarget; const folderName = button.dataset.folder;
+             const folderData = accumulatedFolders.find(f => f.folderName === folderName);
+             if (!folderData || folderData.fileCount === 0) { console.warn(`Data not found for ${folderName}`); return; }
+             try {
+                const blob = new Blob([folderData.outputText], { type: 'text/plain;charset=utf-8' });
+                const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
+                const safeFolderName = folderName.replace(/[^a-z0-9_.-]/gi, '_');
+                a.download = `${safeFolderName}_context.txt`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+                console.log(`Individual download initiated for: ${folderName}`);
+             } catch (error) { console.error(`Error downloading ${folderName}:`, error); addErrorCard("Download Error", `Could not generate file for "${folderName}".`, true); }
+        }
+
+
+        /** Handles the download bundle button click, adds token estimate to header */
         function handleDownloadBundle() {
-            if (accumulatedFolders.length === 0) return;
+            const foldersToBundle = accumulatedFolders.filter(f => f.fileCount > 0);
+            if (foldersToBundle.length === 0) { console.warn("Bundle clicked, no files."); addErrorCard("Bundle Empty", "No folders with text files added.", false); return; }
 
+            // Calculate totals again for the header comment
+            let totalFiles = 0;
+            let totalMinTokens = 0;
+            let totalMaxTokens = 0;
+            foldersToBundle.forEach(f => {
+                totalFiles += f.fileCount;
+                totalMinTokens += f.estimatedMinTokens;
+                totalMaxTokens += f.estimatedMaxTokens;
+            });
+
+            foldersToBundle.sort((a, b) => a.folderName.localeCompare(b.folderName));
+
+            // Add token estimate to bundle header
             let combinedOutput = `// CONTEXT BUNDLE - Generated ${new Date().toLocaleString()}\n`;
-            combinedOutput += `// Contains content from ${accumulatedFolders.length} folder(s).\n\n`;
+            combinedOutput += `// Contains content from ${foldersToBundle.length} folder(s), ${totalFiles.toLocaleString()} file(s).\n`;
+            combinedOutput += `// Estimated Total Tokens: ~${totalMinTokens.toLocaleString()} - ${totalMaxTokens.toLocaleString()} (approximate)\n\n`;
 
-            accumulatedFolders.forEach((folder, index) => {
-                combinedOutput += `// ==== START FOLDER: ${folder.folderName} (${folder.fileCount} files) ====\n\n`;
-                combinedOutput += folder.outputText;
-                // Add separator only if it's not the last folder
-                if (index < accumulatedFolders.length - 1) {
-                    combinedOutput += `\n\n// ==== END FOLDER: ${folder.folderName} ====\n\n---\n\n`;
+            foldersToBundle.forEach((folder, index) => {
+                combinedOutput += `// ==== START FOLDER: ${folder.folderName} (${folder.fileCount} files, ~${folder.estimatedMinTokens.toLocaleString()}-${folder.estimatedMaxTokens.toLocaleString()} est. tokens) ====\n\n`;
+                combinedOutput += folder.outputText; // outputText already contains formatted path/content/separators
+                if (index < foldersToBundle.length - 1) {
+                    combinedOutput += `\n\n// ==== END FOLDER: ${folder.folderName} ====\n\n==========\n\n`;
                 } else {
                     combinedOutput += `\n\n// ==== END FOLDER: ${folder.folderName} ====\n`;
                 }
             });
 
-            try {
+            try { /* ... download blob logic (unchanged) ... */
                 const blob = new Blob([combinedOutput], { type: 'text/plain;charset=utf-8' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = 'context_bundle.txt';
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url;
+                a.download = 'context_bundle.txt'; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
                 console.log('Bundle download initiated.');
-                 // Optional: Flash the button or show a success message?
-            } catch (error) {
-                console.error("Error creating download bundle:", error);
-                addErrorCard("Download Error", "Could not generate the bundle file.", true);
-            }
+            } catch (error) { console.error("Error creating download bundle:", error); addErrorCard("Download Error", "Could not generate the bundle file.", true); }
         }
 
         /** Handles the clear all button click */
-        function handleClearAll() {
-            accumulatedFolders = []; // Clear data
-            outputArea.innerHTML = ''; // Clear UI list
-            updateBundleControls(); // Reset buttons/counter
+        function handleClearAll() { /* ... mostly unchanged, just clear accumulatedFolders and UI ... */
+            accumulatedFolders = [];
+            const cards = outputArea.querySelectorAll('.status-card, .error-card');
+            if(cards.length > 0) {
+                cards.forEach(card => { card.classList.add('opacity-0', 'scale-95'); });
+                setTimeout(() => { outputArea.innerHTML = ''; updateBundleControls(); }, 300);
+            } else { outputArea.innerHTML = ''; updateBundleControls(); }
             console.log('Accumulated folders cleared.');
-            flashDropZoneBorder('border-primary', 'dark:border-primary-dark'); // Visual feedback
+            flashDropZoneBorder('border-primary', 'dark:border-primary-dark');
         }
 
         // Initial setup
         document.addEventListener('DOMContentLoaded', () => {
-            updateBundleControls(); // Set initial button states
+            updateThemeToggleButtonVisuals();
+            updateBundleControls();
         });
 
     </script>
